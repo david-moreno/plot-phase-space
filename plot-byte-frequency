@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+	msg="$0 - Plots the byte frequency of a given BIN\n
+Usage: $0 [BIN]"
+	echo -e $msg
+	exit 0
+fi
+
+if [ ! -e "$1" ]; then
+	echo "ERROR: $1 does not exist"
+	exit 1
+fi
+
+res=`xrandr|grep '*'|tr -s ' '|cut -d' ' -f2`
+s="reset; set yrange [0:]; set xtics rotate out; set boxwidth 0.8 relative; set style fill solid 0.5; "
+hexdump -v -e '1/1 "%02x\n"' "$1" |sort|uniq -c| gnuplot -p -e "$s"'plot "/dev/stdin" u 1:xtic(2) w boxes not'
+#opts="-geometry $res -p -e "
+#hexdump -v -e '1/1 "%02x\n"' "$1" |sort|uniq -c| gnuplot $opts "$s"'plot "/dev/stdin" u 1:xtic(2) w boxes not'
